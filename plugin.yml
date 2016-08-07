@@ -1,0 +1,7 @@
+name: Oldcore
+version: 1.1
+main: net.liverfler.oldcore.Main
+author: Liverfler
+commands:
+    oldcore:
+        description: Old core
