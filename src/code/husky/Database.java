@@ -1,63 +1,136 @@
-/*
- * Decompiled with CFR 0_115.
- * 
- * Could not load the following classes:
- *  org.bukkit.plugin.Plugin
- */
 package code.husky;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import org.bukkit.plugin.Plugin;
 
+/**
+ * Abstract Database class, serves as a base for any connection method (MySQL,
+ * SQLite, etc.)
+ * 
+ * @author -_Husky_-
+ * @author tips48
+ */
 public abstract class Database {
-    protected Connection connection;
-    protected Plugin plugin;
 
-    protected Database(Plugin plugin) {
-        this.plugin = plugin;
-        this.connection = null;
-    }
+	protected Connection connection;
+	
+	/**
+	 * Plugin instance, use for plugin.getDataFolder()
+	 */
+	protected Plugin plugin;
 
-    public abstract Connection openConnection() throws SQLException, ClassNotFoundException;
+	/**
+	 * Creates a new Database
+	 * 
+	 * @param plugin
+	 *            Plugin instance
+	 */
+	protected Database(Plugin plugin) {
+		this.plugin = plugin;
+		this.connection = null;
+	}
 
-    public boolean checkConnection() throws SQLException {
-        if (this.connection != null && !this.connection.isClosed()) {
-            return true;
-        }
-        return false;
-    }
+	/**
+	 * Opens a connection with the database
+	 * 
+	 * @return Opened connection
+	 * @throws SQLException
+	 *             if the connection can not be opened
+	 * @throws ClassNotFoundException
+	 *             if the driver cannot be found
+	 */
+	public abstract Connection openConnection() throws SQLException,
+			ClassNotFoundException;
 
-    public Connection getConnection() {
-        return this.connection;
-    }
+	/**
+	 * Checks if a connection is open with the database
+	 * 
+	 * @return true if the connection is open
+	 * @throws SQLException
+	 *             if the connection cannot be checked
+	 */
+	public boolean checkConnection() throws SQLException {
+		return connection != null && !connection.isClosed();
+	}
 
-    public boolean closeConnection() throws SQLException {
-        if (this.connection == null) {
-            return false;
-        }
-        this.connection.close();
-        return true;
-    }
+	/**
+	 * Gets the connection with the database
+	 * 
+	 * @return Connection with the database, null if none
+	 */
+	public Connection getConnection() {
+		return connection;
+	}
 
-    public ResultSet querySQL(String query) throws SQLException, ClassNotFoundException {
-        if (!this.checkConnection()) {
-            this.openConnection();
-        }
-        Statement statement = this.connection.createStatement();
-        ResultSet result = statement.executeQuery(query);
-        return result;
-    }
+	/**
+	 * Closes the connection with the database
+	 * 
+	 * @return true if successful
+	 * @throws SQLException
+	 *             if the connection cannot be closed
+	 */
+	public boolean closeConnection() throws SQLException {
+		if (connection == null) {
+			return false;
+		}
+		connection.close();
+		return true;
+	}
 
-    public int updateSQL(String query) throws SQLException, ClassNotFoundException {
-        if (!this.checkConnection()) {
-            this.openConnection();
-        }
-        Statement statement = this.connection.createStatement();
-        int result = statement.executeUpdate(query);
-        return result;
-    }
+
+	/**
+	 * Executes a SQL Query<br>
+	 * 
+	 * If the connection is closed, it will be opened
+	 * 
+	 * @param query
+	 *            Query to be run
+	 * @return the results of the query
+	 * @throws SQLException
+	 *             If the query cannot be executed
+	 * @throws ClassNotFoundException
+	 *             If the driver cannot be found; see {@link #openConnection()}
+	 */
+	public ResultSet querySQL(String query) throws SQLException,
+			ClassNotFoundException {
+		if (!checkConnection()) {
+			openConnection();
+		}
+
+		Statement statement = connection.createStatement();
+
+		ResultSet result = statement.executeQuery(query);
+
+		return result;
+	}
+
+	/**
+	 * Executes an Update SQL Query<br>
+	 * See {@link java.sql.Statement#executeUpdate(String)}<br>
+	 * If the connection is closed, it will be opened
+	 * 
+	 * @param query
+	 *            Query to be run
+	 * @return Result Code, see {@link java.sql.Statement#executeUpdate(String)}
+	 * @throws SQLException
+	 *             If the query cannot be executed
+	 * @throws ClassNotFoundException
+	 *             If the driver cannot be found; see {@link #openConnection()}
+	 */
+	public int updateSQL(String query) throws SQLException,
+			ClassNotFoundException {
+		if (!checkConnection()) {
+			openConnection();
+		}
+
+		Statement statement = connection.createStatement();
+
+		int result = statement.executeUpdate(query);
+
+		return result;
+	}
 }
-
