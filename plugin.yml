@@ -1,7 +1,7 @@
 name: Oldcore
-version: 1.1
+version: 2.0
 main: net.liverfler.oldcore.Main
 author: Liverfler
 commands:
     oldcore:
-        description: Old core
+        description: Oldcore parancsok
